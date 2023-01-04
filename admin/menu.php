@@ -1,9 +1,9 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly
 
-/**
- * Class DT_Custom_Login_JWT_Menu
- */
+if( is_admin() ) {
+    DT_Custom_Login_JWT_Menu::instance();
+}
 class DT_Custom_Login_JWT_Menu {
 
     public $token = 'disciple_tools_custom_login_jwt';
@@ -73,10 +73,15 @@ class DT_Custom_Login_JWT_Menu {
         }
 
         $vars = $this->process_postback();
+        $is_dt = class_exists( 'Disciple_Tools' );
         $tabs = [];
-        dt_write_log($vars);
         foreach( $vars as $val ) {
-            $tabs[$val['tab']] = ucwords( $val['tab'] );
+            if ( $is_dt === $val['requires_dt'] ) {
+                $tabs[$val['tab']] = ucwords( $val['tab'] );
+            }
+            elseif ( ! $val['requires_dt'] ) {
+                $tabs[$val['tab']] = ucwords( $val['tab'] );
+            }
         }
         ?>
         <div class="wrap">
@@ -95,8 +100,6 @@ class DT_Custom_Login_JWT_Menu {
                 <div id="poststuff">
                     <div id="post-body" class="metabox-holder">
                         <div id="post-body-content">
-                            <!-- Main Column -->
-
                             <!-- Box -->
                             <form method="post">
                                 <?php wp_nonce_field( $this->token.get_current_user_id(), $this->token . '_nonce' ) ?>
@@ -106,7 +109,12 @@ class DT_Custom_Login_JWT_Menu {
                                     if ( ! empty( $vars ) ) {
                                         foreach( $vars as $key => $value ) {
                                             if ( $tab === $value['tab'] ) {
-                                                $this->template( $value );
+                                                if ( $is_dt === $value['requires_dt'] ) {
+                                                    $this->template( $value );
+                                                }
+                                                elseif ( ! $value['requires_dt'] ) {
+                                                    $this->template( $value );
+                                                }
                                             }
                                         }
                                     }
@@ -120,7 +128,6 @@ class DT_Custom_Login_JWT_Menu {
                                 </table>
                             </form>
                             <br>
-
                             <!-- End Main Column -->
                         </div><!-- end post-body-content -->
                     </div><!-- post-body meta box container -->
@@ -198,150 +205,13 @@ class DT_Custom_Login_JWT_Menu {
                 }
             }
 
-            if ( $params['delete'] ) {
+            if ( isset( $params['delete'] ) ) {
                 delete_option('dt_custom_login_fields' );
             } else {
                 update_option( 'dt_custom_login_fields', $vars, true );
             }
-
-            dt_write_log($_POST);
         }
 
         return $vars;
     }
 }
-DT_Custom_Login_JWT_Menu::instance();
-
-function dt_custom_login_fields() {
-    $defaults = [
-        'pages_label' => [
-            'tab' => 'general',
-            'key' => 'pages_label',
-            'label' => 'PAGES',
-            'description' => '',
-            'value' => '',
-            'type' => 'label',
-        ],
-        'login_page' => [
-            'tab' => 'general',
-            'key' => 'login_page',
-            'label' => 'Login Page',
-            'description' => 'Enables the Login Page',
-            'default' => [
-                'enabled' => 'Enabled',
-                'disabled' => 'Disabled',
-            ],
-            'value' => 'enabled',
-            'type' => 'select',
-        ],
-        'privacy_policy_page' => [
-            'tab' => 'general',
-            'key' => 'privacy_policy_page',
-            'label' => 'Privacy Policy',
-            'description' => 'Enables the Privacy Policy',
-            'default' => [
-                'enabled' => 'Enabled',
-                'disabled' => 'Disabled',
-            ],
-            'value' => 'enabled',
-            'type' => 'select',
-        ],
-        'terms_of_service_page' => [
-            'tab' => 'general',
-            'key' => 'terms_of_service_page',
-            'label' => 'Terms of Service Page',
-            'description' => 'Enables the Terms of Service Page',
-            'default' => [
-                'enabled' => 'Enabled',
-                'disabled' => 'Disabled',
-            ],
-            'value' => 'enabled',
-            'type' => 'select',
-        ],
-        'user_profile_page' => [
-            'tab' => 'general',
-            'key' => 'user_profile_page',
-            'label' => 'User Profile',
-            'description' => 'Enables the User Profile',
-            'default' => [
-                'enabled' => 'Enabled',
-                'disabled' => 'Disabled',
-            ],
-            'value' => 'enabled',
-            'type' => 'select',
-        ],
-        'registration_hold_page' => [
-            'tab' => 'general',
-            'key' => 'registration_hold_page',
-            'label' => 'Registration Hold Page',
-            'description' => 'Enables the Registration Hold ',
-            'default' => [
-                'enabled' => 'Enabled',
-                'disabled' => 'Disabled',
-            ],
-            'value' => 'enabled',
-            'type' => 'select',
-        ],
-
-
-        'shortcode_modal' => [
-            'tab' => 'shortcodes',
-            'key' => 'shortcode_modal',
-            'label' => 'Modal Shortcode',
-            'description' => '[zume_footer_logon_modal]',
-            'description_2' => 'Use this shortcode in the footer of a page to add the full modal and login functions.',
-            'value' => '',
-            'type' => 'label',
-        ],
-        'shortcode_zume_logon_button' => [
-            'tab' => 'shortcodes',
-            'key' => 'shortcode_zume_logon_button',
-            'label' => 'Logon Button',
-            'description' => '[zume_logon_button]',
-            'description_2' => '',
-            'value' => '',
-            'type' => 'label',
-        ],
-        'shortcode_zume_logon_button_with_name' => [
-            'tab' => 'shortcodes',
-            'key' => 'shortcode_zume_logon_button_with_name',
-            'label' => 'Logon Button with Name',
-            'description' => '[zume_logon_button_with_name]',
-            'description_2' => '',
-            'value' => '',
-            'type' => 'label',
-        ],
-
-        'firebase' => [
-            'tab' => 'firebase',
-            'key' => 'firebase',
-            'label' => 'Firebase',
-            'description' => 'firebase description',
-            'value' => '',
-            'type' => 'text',
-        ],
-
-        'captcha_key' => [
-            'tab' => 'captcha',
-            'key' => 'captcha_key',
-            'label' => 'Captcha Key',
-            'description' => 'captcha description',
-            'value' => '',
-            'type' => 'text',
-        ],
-    ];
-
-    $defaults_count = count($defaults);
-
-    $saved_fields = get_option('dt_custom_login_fields', [] );
-    $saved_count = count($saved_fields);
-
-    $fields = wp_parse_args($saved_fields, $defaults);
-
-    if ( $defaults_count !== $saved_count ) {
-        update_option( 'dt_custom_login_fields', $fields, true );
-    }
-
-    return $fields;
-}
-

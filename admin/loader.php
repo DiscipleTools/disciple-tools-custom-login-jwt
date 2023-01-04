@@ -1,8 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-
-
 /**
  * Auto loads level 1 php files, and file in subdirectories
  */

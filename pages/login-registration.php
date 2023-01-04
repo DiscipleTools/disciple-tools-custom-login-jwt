@@ -15,13 +15,11 @@ class Disciple_Tools_Custom_Login_Page extends DT_Custom_Login_Page_Base
         parent::__construct();
 
         $url = dt_get_url_path();
-        if ( ( 'login-registration' === substr( $url, 0, 14 ) ) ) {
+        if ( ( 'login-registration' === substr( $url, 0, 18 ) ) ) {
             add_action( "template_redirect", [ $this, 'theme_redirect' ] );
 
-            add_filter( 'dt_blank_access', function(){ return true;
-            } );
-            add_filter( 'dt_allow_non_login_access', function(){ return true;
-            }, 100, 1 );
+            add_filter( 'dt_blank_access', function(){ return true; } );
+            add_filter( 'dt_allow_non_login_access', function(){ return true;}, 100, 1 );
 
             add_filter( "dt_blank_title", [ $this, "_browser_tab_title" ] );
             add_action( 'dt_blank_head', [ $this, '_header' ] );
@@ -37,9 +35,14 @@ class Disciple_Tools_Custom_Login_Page extends DT_Custom_Login_Page_Base
     }
 
     public function body(){
-        ?>
-        Login
-        <?php
+        do_action('dt_custom_login_registration_top' );
+
+        echo '<br>';
+
+        zume_logon_button_with_name();
+        zume_footer_logon_modal();
+
+        do_action('dt_custom_login_registration_bottom' );
     }
 }
 Disciple_Tools_Custom_Login_Page::instance();

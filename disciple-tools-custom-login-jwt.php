@@ -56,9 +56,26 @@ class Disciple_Tools_Custom_Login_JWT {
 
         require_once('shortcodes/loader.php');
         require_once('pages/loader.php');
+        require_once('admin/loader.php');
+
+        $dt_custom_login_fields = dt_custom_login_fields();
+        if( 'enabled' === $dt_custom_login_fields['login_page']['value'] ) {
+            require_once('pages/login-registration.php');
+        }
+        if( 'enabled' === $dt_custom_login_fields['privacy_policy_page']['value'] ) {
+            require_once('pages/privacy-policy.php');
+        }
+        if( 'enabled' === $dt_custom_login_fields['registration_hold_page']['value'] ) {
+            require_once('pages/registration-holding.php');
+        }
+        if( 'enabled' === $dt_custom_login_fields['terms_of_service_page']['value'] ) {
+            require_once('pages/terms-of-service.php');
+        }
+        if( 'enabled' === $dt_custom_login_fields['user_profile_page']['value'] ) {
+            require_once('pages/user-profile.php');
+        }
 
         if ( is_admin() ) {
-            require_once( 'admin/loader.php' );
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
 
@@ -251,4 +268,164 @@ if ( ! class_exists( 'Disciple_Tools' ) && ! function_exists( 'dt_get_url_path' 
         }
         return '';
     }
+}
+
+function dt_custom_login_fields() {
+    $defaults = [
+
+        // general
+        'general_label' => [
+            'tab' => 'general',
+            'key' => 'general_label',
+            'label' => 'GENERAL',
+            'description' => '',
+            'value' => '',
+            'type' => 'label',
+            'requires_dt' => false
+        ],
+
+
+        // pages
+        'pages_label' => [
+            'tab' => 'pages',
+            'key' => 'pages_label',
+            'label' => 'PAGES',
+            'description' => '',
+            'value' => '',
+            'type' => 'label',
+            'requires_dt' => true,
+        ],
+        'login_page' => [
+            'tab' => 'pages',
+            'key' => 'login_page',
+            'label' => 'Login Page',
+            'description' => 'Enables the Login Page (<a href="'.site_url().'/login-registration" target="_blank">'.site_url().'/login-registration</a>)',
+            'default' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+            'value' => 'enabled',
+            'type' => 'select',
+            'requires_dt' => true,
+        ],
+        'privacy_policy_page' => [
+            'tab' => 'pages',
+            'key' => 'privacy_policy_page',
+            'label' => 'Privacy Policy',
+            'description' => 'Enables the Privacy Policy (<a href="'.site_url().'/privacy-policy" target="_blank">'.site_url().'/privacy-policy</a>)',
+            'default' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+            'value' => 'enabled',
+            'type' => 'select',
+            'requires_dt' => true,
+        ],
+        'terms_of_service_page' => [
+            'tab' => 'pages',
+            'key' => 'terms_of_service_page',
+            'label' => 'Terms of Service Page',
+            'description' => 'Enables the Terms of Service Page (<a href="'.site_url().'/terms-of-service" target="_blank">'.site_url().'/terms-of-service</a>)',
+            'default' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+            'value' => 'enabled',
+            'type' => 'select',
+            'requires_dt' => true,
+        ],
+        'user_profile_page' => [
+            'tab' => 'pages',
+            'key' => 'user_profile_page',
+            'label' => 'User Profile',
+            'description' => 'Enables the User Profile (<a href="'.site_url().'/user-profile" target="_blank">'.site_url().'/user-profile</a>)',
+            'default' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+            'value' => 'enabled',
+            'type' => 'select',
+            'requires_dt' => true
+        ],
+        'registration_hold_page' => [
+            'tab' => 'pages',
+            'key' => 'registration_hold_page',
+            'label' => 'Registration Hold Page',
+            'description' => 'Enables the Registration Hold (<a href="'.site_url().'/registration-holding" target="_blank">'.site_url().'/registration-holding</a>)',
+            'default' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+            'value' => 'enabled',
+            'type' => 'select',
+            'requires_dt' => true
+        ],
+
+        // shortcode
+        'shortcode_modal' => [
+            'tab' => 'shortcodes',
+            'key' => 'shortcode_modal',
+            'label' => 'Modal Shortcode',
+            'description' => '[zume_footer_logon_modal]',
+            'description_2' => 'Use this shortcode in the footer of a page to add the full modal and login functions.',
+            'value' => '',
+            'type' => 'label',
+            'requires_dt' => false
+        ],
+        'shortcode_zume_logon_button' => [
+            'tab' => 'shortcodes',
+            'key' => 'shortcode_zume_logon_button',
+            'label' => 'Logon Button',
+            'description' => '[zume_logon_button]',
+            'description_2' => '',
+            'value' => '',
+            'type' => 'label',
+            'requires_dt' => false
+        ],
+        'shortcode_zume_logon_button_with_name' => [
+            'tab' => 'shortcodes',
+            'key' => 'shortcode_zume_logon_button_with_name',
+            'label' => 'Logon Button with Name',
+            'description' => '[zume_logon_button_with_name]',
+            'description_2' => '',
+            'value' => '',
+            'type' => 'label',
+            'requires_dt' => false
+        ],
+
+        // firebase
+        'firebase' => [
+            'tab' => 'firebase',
+            'key' => 'firebase',
+            'label' => 'Firebase',
+            'description' => 'firebase description',
+            'value' => '',
+            'type' => 'text',
+            'requires_dt' => false
+        ],
+
+        // captcha
+        'captcha_key' => [
+            'tab' => 'captcha',
+            'key' => 'captcha_key',
+            'label' => 'Captcha Key',
+            'description' => 'captcha description',
+            'value' => '',
+            'type' => 'text',
+            'requires_dt' => false
+        ],
+    ];
+
+    $defaults_count = count($defaults);
+
+    $saved_fields = get_option('dt_custom_login_fields', [] );
+    $saved_count = count($saved_fields);
+
+    $fields = wp_parse_args($saved_fields, $defaults);
+
+    if ( $defaults_count !== $saved_count ) {
+        update_option( 'dt_custom_login_fields', $fields, true );
+    }
+
+    return $fields;
 }
