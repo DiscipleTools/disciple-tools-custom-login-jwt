@@ -5,7 +5,7 @@
  * Description: Disciple.Tools - Custom Login JWT adds a custom login/registration page with additional SSO options (Google, Facebook).
  * Text Domain: disciple-tools-custom-login-jwt
  * Domain Path: /languages
- * Version:  0.3
+ * Version:  0.1
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-custom-login-jwt
  * Requires at least: 4.7.0
@@ -18,16 +18,7 @@
  *          https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
-}
-
-$jwt_class_already_loaded = false;
-if ( ! class_exists( 'Jwt_Auth' ) ) {
-    require_once( 'jwt-library/wp-api-jwt-auth/jwt-auth.php' );
-} else {
-    $class_already_loaded = true;
-}
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
  * Gets the instance of the `Disciple_Tools_Custom_Login_JWT` class.
@@ -59,10 +50,15 @@ class Disciple_Tools_Custom_Login_JWT {
 
     private function __construct() {
 
+        if ( ! class_exists( 'Jwt_Auth' ) ) {
+            require_once( 'jwt-library/wp-api-jwt-auth/jwt-auth.php' );
+        }
 
+        require_once('shortcodes/loader.php');
+        require_once('pages/loader.php');
 
         if ( is_admin() ) {
-            require_once( 'admin/admin-menu-and-tabs.php' );
+            require_once( 'admin/loader.php' );
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
 
@@ -71,7 +67,6 @@ class Disciple_Tools_Custom_Login_JWT {
 
     public function plugin_description_links( $links_array, $plugin_file_name, $plugin_data, $status ) {
         if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
-
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
         }
 
@@ -230,3 +225,30 @@ add_action( 'plugins_loaded', function (){
         }
     }
 } );
+
+if ( ! class_exists( 'Disciple_Tools' ) && ! function_exists( 'dt_get_url_path' ) ) {
+    function dt_get_url_path( $ignore_query_parameters = false ) {
+        if ( isset( $_SERVER['HTTP_HOST'] ) ) {
+            $url  = ( !isset( $_SERVER['HTTPS'] ) || @( $_SERVER['HTTPS'] != 'on' ) ) ? 'http://'. sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : 'https://'. sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) );
+            if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+                $url .= esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+            }
+            //remove the domain part. Ex: https://example.com/
+            $url = trim( str_replace( get_site_url(), '', $url ), '/' );
+
+            //remove query parameters
+            if ( $ignore_query_parameters ){
+                $url = strtok( $url, '?' ); //allow get parameters
+            }
+            //remove trailing '?'
+            if ( substr( $url, -1 ) === '?' ){
+                $url = substr( $url, 0, -1 );
+            }
+            // remove trailing '/'
+            $url = untrailingslashit( $url );
+
+            return $url;
+        }
+        return '';
+    }
+}
