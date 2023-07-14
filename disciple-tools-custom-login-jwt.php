@@ -419,7 +419,9 @@ function dt_custom_login_fields() {
     $defaults_count = count($defaults);
 
     $saved_fields = get_option('dt_custom_login_fields', [] );
-    $saved_count = count($saved_fields);
+    if ( $saved_fields ) {
+        $saved_count = count($saved_fields);
+    }
 
     $fields = wp_parse_args($saved_fields, $defaults);
 
